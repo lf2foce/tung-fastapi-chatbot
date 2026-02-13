@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock Chatbot</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --panel: #0f1a30;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.62);
+        --user: #2563eb;
+        --bot: rgba(255, 255, 255, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial;
+        background: radial-gradient(1200px 600px at 10% 10%, #162a52, var(--bg));
+        color: var(--text);
+        height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+      }
+
+      .app {
+        width: min(980px, 100%);
+        height: min(720px, 100%);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        backdrop-filter: blur(14px);
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: rgba(0, 0, 0, 0.22);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .title {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .title h1 {
+        font-size: 14px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+
+      .title .sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 9px 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      button:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .chip {
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        border-radius: 999px;
+        user-select: none;
+      }
+
+      .messages {
+        padding: 18px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .row {
+        display: flex;
+      }
+
+      .row.user {
+        justify-content: flex-end;
+      }
+
+      .bubble {
+        max-width: min(680px, 92%);
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.35;
+        font-size: 14px;
+      }
+
+      .user .bubble {
+        background: linear-gradient(180deg, rgba(37, 99, 235, 0.95), rgba(37, 99, 235, 0.75));
+        border-color: rgba(37, 99, 235, 0.35);
+      }
+
+      .assistant .bubble {
+        background: var(--bot);
+      }
+
+      .meta {
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        gap: 10px;
+      }
+
+      .composer {
+        padding: 14px 16px;
+        border-top: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.18);
+      }
+
+      form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        padding: 12px 12px;
+        font-size: 14px;
+        outline: none;
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      .send {
+        background: rgba(37, 99, 235, 0.9);
+        border-color: rgba(37, 99, 235, 0.45);
+        padding: 12px 14px;
+      }
+
+      .send:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .hint {
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .kbd {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-size: 12px;
+      }
+
+      .typing {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        animation: bounce 1s infinite ease-in-out;
+      }
+
+      .dot:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+
+      .dot:nth-child(3) {
+        animation-delay: 0.24s;
+      }
+
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.5;
+        }
+        40% {
+          transform: translateY(-4px);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="title">
+          <h1>Mock Chatbot</h1>
+          <div class="sub">UI nối với FastAPI mock backend</div>
+        </div>
+        <div class="actions">
+          <div class="chip" id="sessionChip">session: -</div>
+          <button id="newChatBtn" type="button">New chat</button>
+          <button id="openDocsBtn" type="button">/docs</button>
+        </div>
+      </header>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="composer">
+        <form id="chatForm">
+          <input
+            id="messageInput"
+            type="text"
+            autocomplete="off"
+            placeholder="Nhập tin nhắn... (gợi ý: thử 'gấp đôi 12')"
+          />
+          <button class="send" id="sendBtn" type="submit">Send</button>
+        </form>
+        <div class="hint">
+          <div>API: <span class="kbd">POST /api/chat</span> | UI: <span class="kbd">GET /</span></div>
+          <div><span class="kbd">Enter</span> để gửi</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const STORAGE_KEY = "mock_chatbot_session_id";
+
+      const elMessages = document.getElementById("messages");
+      const elForm = document.getElementById("chatForm");
+      const elInput = document.getElementById("messageInput");
+      const elSend = document.getElementById("sendBtn");
+      const elChip = document.getElementById("sessionChip");
+      const elNewChat = document.getElementById("newChatBtn");
+      const elOpenDocs = document.getElementById("openDocsBtn");
+
+      let sessionId = localStorage.getItem(STORAGE_KEY) || "";
+
+      function formatTime(ts) {
+        try {
+          const d = new Date(ts);
+          return d.toLocaleString("vi-VN");
+        } catch {
+          return "";
+        }
+      }
+
+      function setSession(id) {
+        sessionId = id || "";
+        if (sessionId) {
+          localStorage.setItem(STORAGE_KEY, sessionId);
+          elChip.textContent = `session: ${sessionId.slice(0, 8)}…`;
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+          elChip.textContent = "session: -";
+        }
+      }
+
+      function scrollToBottom() {
+        elMessages.scrollTop = elMessages.scrollHeight;
+      }
+
+      function addMessage(role, content, ts) {
+        const row = document.createElement("div");
+        row.className = `row ${role === "user" ? "user" : "assistant"}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = content;
+
+        const wrapper = document.createElement("div");
+        wrapper.appendChild(bubble);
+
+        if (ts) {
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = formatTime(ts);
+          wrapper.appendChild(meta);
+        }
+
+        row.appendChild(wrapper);
+        elMessages.appendChild(row);
+        scrollToBottom();
+      }
+
+      function addTyping() {
+        const row = document.createElement("div");
+        row.className = "row assistant";
+        row.id = "typingRow";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+
+        const typing = document.createElement("div");
+        typing.className = "typing";
+        typing.innerHTML =
+          '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+
+        bubble.appendChild(typing);
+        row.appendChild(bubble);
+        elMessages.appendChild(row);
+        scrollToBottom();
+      }
+
+      function removeTyping() {
+        const row = document.getElementById("typingRow");
+        if (row) row.remove();
+      }
+
+      async function loadHistory() {
+        if (!sessionId) return;
+        try {
+          const res = await fetch(`/api/chat/${encodeURIComponent(sessionId)}`);
+          if (!res.ok) return;
+          const data = await res.json();
+          const messages = data.messages || [];
+          elMessages.innerHTML = "";
+          for (const m of messages) addMessage(m.role, m.content, m.ts);
+        } catch {
+          return;
+        }
+      }
+
+      async function sendMessage(message) {
+        const payload = { message };
+        if (sessionId) payload.session_id = sessionId;
+
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || "Request failed");
+        }
+
+        return await res.json();
+      }
+
+      function boot() {
+        setSession(sessionId);
+        if (sessionId) loadHistory();
+        addMessage("assistant", "Chào bạn! Hãy nhập tin nhắn để bắt đầu.", new Date().toISOString());
+      }
+
+      elForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const text = (elInput.value || "").trim();
+        if (!text) return;
+
+        elInput.value = "";
+        elInput.focus();
+        addMessage("user", text, new Date().toISOString());
+
+        elSend.disabled = true;
+        addTyping();
+
+        try {
+          const data = await sendMessage(text);
+          setSession(data.session_id);
+          removeTyping();
+          addMessage("assistant", data.reply, new Date().toISOString());
+        } catch (err) {
+          removeTyping();
+          addMessage("assistant", `Lỗi gọi API: ${String(err.message || err)}`, new Date().toISOString());
+        } finally {
+          elSend.disabled = false;
+        }
+      });
+
+      elNewChat.addEventListener("click", () => {
+        setSession("");
+        elMessages.innerHTML = "";
+        boot();
+      });
+
+      elOpenDocs.addEventListener("click", () => {
+        window.open("/docs", "_blank");
+      });
+
+      boot();
+    </script>
+  </body>
+</html>
