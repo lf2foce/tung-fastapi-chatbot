@@ -1,77 +1,40 @@
-# FastAPI Mock Chatbot + Double Number Service
+# Gemini 2.0 Flash Chatbot Service
 
-Dự án này cung cấp:
-- Một UI chatbot dạng mock (HTML/CSS/JS) nối được với backend FastAPI.
-- Một API đơn giản để gấp đôi một số nguyên.
+Dự án này cung cấp một giao diện Chatbot AI thực thụ sử dụng mô hình **Gemini 2.0 Flash** mới nhất và thư viện **google-genai** của Google.
 
 ## Tính năng
-- UI chatbot tại `/`.
-- Mock Chat API:
-  - `POST /api/chat`: gửi message và nhận reply (kèm `session_id`).
-  - `GET /api/chat/{session_id}`: lấy lịch sử hội thoại theo session.
-  - `GET /api/health`: health check.
-- Double API:
-  - `GET /double/{number}`: trả về kết quả gấp đôi.
-- Tài liệu API tự động tại `/docs` (Swagger UI).
+- **UI Chatbot**: Giao diện chat hiện đại tại `/`.
+- **Gemini 2.0 Flash**: Phản hồi cực nhanh và thông minh từ AI mới nhất của Google.
+- **Async Handling**: Xử lý bất đồng bộ (async/await) giúp server chịu tải tốt nhiều người dùng cùng lúc.
+- **Session Management**: Lưu lịch sử chat theo `session_id` (in-memory).
+- **Double API**: Endpoint `/double/{number}` vẫn được giữ nguyên.
 
 ## Cách cài đặt và chạy
 
-1. **Cài đặt thư viện cần thiết:**
+1. **Cài đặt thư viện:**
    ```bash
-   pip install fastapi uvicorn
+   pip install -r requirements.txt
    ```
 
-2. **Chạy server:**
-   ```bash
-   uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+2. **Cấu hình API Key:**
+   Tạo file `.env` và thêm key của bạn:
+   ```env
+   GOOGLE_API_KEY=your_api_key_here
    ```
+
+3. **Chạy server:**
+   ```bash
+   python main.py
+   ```
+   Server sẽ chạy tại `http://127.0.0.1:8001`.
 
 ## Cách sử dụng
 
-### 1. Mở UI chatbot
-Mở trình duyệt tại:
-`http://127.0.0.1:8001/`
+### 1. Chat với AI
+Truy cập `http://127.0.0.1:8001/` để mở giao diện chat.
 
-UI sẽ lưu `session_id` vào `localStorage` để refresh vẫn giữ lịch sử.
-
-### 2. Gọi Chat API
-
-Gửi một message (ví dụ):
-```bash
-curl -X POST http://127.0.0.1:8001/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message":"xin chào"}'
-```
-
-Ví dụ response:
-```json
-{
-  "session_id": "....",
-  "reply": "Chào bạn! Bạn muốn mình giúp gì?",
-  "messages": [
-    {"role":"user","content":"xin chào","ts":"..."},
-    {"role":"assistant","content":"Chào bạn! Bạn muốn mình giúp gì?","ts":"..."}
-  ]
-}
-```
-
-Lấy lịch sử theo session:
-`http://127.0.0.1:8001/api/chat/<session_id>`
-
-### 3. Gấp đôi một số
-Truy cập đường dẫn sau (ví dụ với số 25):
-`http://127.0.0.1:8001/double/25`
-
-**Kết quả trả về:**
-```json
-{
-  "input": 25,
-  "result": 50
-}
-```
-
-### 4. Xem tài liệu API (Swagger UI)
-FastAPI tự động tạo tài liệu hướng dẫn tại:
-`http://127.0.0.1:8001/docs`
-
-Tại đây bạn có thể thử nghiệm trực tiếp các endpoint một cách trực quan.
+### 2. API Endpoints
+- **Chat API**: `POST /api/chat` với body `{"message": "nội dung", "session_id": "tùy chọn"}`.
+- **Lịch sử**: `GET /api/chat/{session_id}`.
+- **Gấp đôi số**: `GET /double/{number}`.
+- **Tài liệu API**: `http://127.0.0.1:8001/docs`.
