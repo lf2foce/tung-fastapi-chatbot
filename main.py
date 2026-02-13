@@ -43,6 +43,7 @@ app = FastAPI(title="Gemini 2.0 Flash Chatbot + Double API")
 
 BASE_DIR = Path(__file__).resolve().parent
 UI_FILE_PATH = BASE_DIR / "static" / "index.html"
+DONATE_FILE_PATH = BASE_DIR / "static" / "donate.html"
 
 # In-memory storage for chat sessions
 # New SDK format for history: list[types.Content]
@@ -78,6 +79,11 @@ class ChatHistoryResponse(BaseModel):
 @app.get("/", include_in_schema=False)
 async def ui() -> FileResponse:
     return FileResponse(UI_FILE_PATH)
+
+
+@app.get("/donate", include_in_schema=False)
+async def donate_page() -> FileResponse:
+    return FileResponse(DONATE_FILE_PATH)
 
 
 @app.get("/api/health")

@@ -248,6 +248,7 @@
           <div class="chip" id="sessionChip">session: -</div>
           <button id="newChatBtn" type="button">New chat</button>
           <button id="openDocsBtn" type="button">/docs</button>
+          <button id="donateBtn" type="button" style="background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%); color: #000;">Donate</button>
         </div>
       </header>
 
@@ -280,6 +281,7 @@
       const elChip = document.getElementById("sessionChip");
       const elNewChat = document.getElementById("newChatBtn");
       const elOpenDocs = document.getElementById("openDocsBtn");
+      const elDonate = document.getElementById("donateBtn");
 
       let sessionId = localStorage.getItem(STORAGE_KEY) || "";
 
@@ -425,6 +427,10 @@
 
       elOpenDocs.addEventListener("click", () => {
         window.open("/docs", "_blank");
+      });
+
+      elDonate.addEventListener("click", () => {
+        window.location.href = "/donate";
       });
 
       boot();
