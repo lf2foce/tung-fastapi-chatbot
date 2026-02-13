@@ -31,10 +31,25 @@ Dự án này cung cấp một giao diện Chatbot AI thực thụ sử dụng m
 ## Cách sử dụng
 
 ### 1. Chat với AI
-Truy cập `http://127.0.0.1:8001/` để mở giao diện chat.
+Truy cập `http://127.0.0.1:8001/` (hoặc domain của bạn) để mở giao diện chat.
 
 ### 2. API Endpoints
 - **Chat API**: `POST /api/chat` với body `{"message": "nội dung", "session_id": "tùy chọn"}`.
 - **Lịch sử**: `GET /api/chat/{session_id}`.
 - **Gấp đôi số**: `GET /double/{number}`.
-- **Tài liệu API**: `http://127.0.0.1:8001/docs`.
+- **Tài liệu API**: `/docs`.
+
+## Deploy lên Render
+
+Để đưa ứng dụng này lên Render, bạn làm theo các bước sau:
+
+1. **Đẩy code lên GitHub**: Đảm bảo bạn đã có các file `requirements.txt` và `.gitignore`.
+2. **Tạo Web Service mới trên Render**:
+   - Kết nối với repository GitHub của bạn.
+   - **Runtime**: `Python 3`.
+   - **Build Command**: `pip install -r requirements.txt`.
+   - **Start Command**: `python main.py`.
+3. **Cấu hình biến môi trường (Environment Variables)**:
+   - Vào tab **Environment** trên Render.
+   - Thêm key: `GOOGLE_API_KEY` với giá trị API Key của bạn.
+   - (Render sẽ tự động cấp biến `PORT`, code đã được cấu hình để nhận biến này).
